@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Онлайн-калькулятор</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 300px;
+      margin: 50px auto;
+    }
+    #calculator {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    input[type="text"] {
+      width: 100%;
+      height: 40px;
+      font-size: 1.2em;
+      padding: 5px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+    button {
+      padding: 10px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    #history {
+      margin-top: 15px;
+      max-height: 150px;
+      overflow-y: auto;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+    #history h3 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div id="calculator">
+  <input type="text" id="display" readonly />
+  <div class="buttons">
+    <button onclick="appendNumber('7')">7</button>
+    <button onclick="appendNumber('8')">8</button>
+    <button onclick="appendNumber('9')">9</button>
+    <button onclick="setOperation('+')">+</button>
+    <button onclick="appendNumber('4')">4</button>
+    <button onclick="appendNumber('5')">5</button>
+    <button onclick="appendNumber('6')">6</button>
+    <button onclick="setOperation('-')">-</button>
+    <button onclick="appendNumber('1')">1</button>
+    <button onclick="appendNumber('2')">2</button>
+    <button onclick="appendNumber('3')">3</button>
+    <button onclick="setOperation('*')">*</button>
+    <button onclick="appendNumber('0')">0</button>
+    <button onclick="clearDisplay()">C</button>
+    <button onclick="calculate()">=</button>
+    <button onclick="setOperation('/')">/</button>
+  </div>
+
+  <div id="history">
+    <h3>История операций</h3>
+    <ul id="historyList"></ul>
+  </div>
+</div>
+
+<script>
+  let currentInput = '';
+  let firstOperand = null;
+  let currentOperation = null;
+  const display = document.getElementById('display');
+  const historyList = document.getElementById('historyList');
+
+  function appendNumber(number) {
+    currentInput += number;
+    display.value = currentInput;
+  }
+
+  function setOperation(operation) {
+    if (currentInput === '') return;
+    if (firstOperand === null) {
+      firstOperand = parseFloat(currentInput);
+    } else if (currentOperation) {
+      firstOperand = performOperation(firstOperand, parseFloat(currentInput), currentOperation);
+      display.value = firstOperand;
+    }
+    currentOperation = operation;
+    currentInput = '';
+  }
+
+  function performOperation(a, b, operation) {
+    switch (operation) {
+      case '+': return a + b;
+      case '-': return a - b;
+      case '*': return a * b;
+      case '/': return b !== 0 ? a / b : 'Ошибка';
+    }
+  }
+
+  function calculate() {
+    if (currentInput === '' || currentOperation === null) return;
+    const secondOperand = parseFloat(currentInput);
+    const result = performOperation(firstOperand, secondOperand, currentOperation);
+    const operationStr = `${firstOperand} ${currentOperation} ${secondOperand} = ${result}`;
+    addToHistory(operationStr);
+    display.value = result;
+    firstOperand = null;
+    currentOperation = null;
+    currentInput = result.toString();
+  }
+
+  function clearDisplay() {
+    currentInput = '';
+    firstOperand = null;
+    currentOperation = null;
+    display.value = '';
+  }
+
+  function addToHistory(entry) {
+    const li = document.createElement('li');
+    li.textContent = entry;
+    historyList.appendChild(li);
+  }
+</script>
+
+</body>
+</html
